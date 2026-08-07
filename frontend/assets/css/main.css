@@ -1,0 +1,166 @@
+/* ---------------------------------------------------------------------- */
+/* Xarajatlarim — design tokens                                            */
+/* A quiet paper-ledger palette with one signature motif: the torn receipt */
+/* edge + barcode strip, used on the pieces of UI tied to money & chek.    */
+/* ---------------------------------------------------------------------- */
+
+:root {
+  --paper: #f3f5f1;
+  --paper-alt: #ffffff;
+  --ink: #16211c;
+  --ink-muted: #5c6b62;
+  --line: #dfe4dc;
+  --brand: #0e7a5f;
+  --brand-strong: #0b5f49;
+  --brand-soft: #e3f3ec;
+  --income: #1b8a5a;
+  --expense: #c1462f;
+  --gold: #b8892b;
+
+  color-scheme: light;
+}
+
+html.dark {
+  --paper: #101713;
+  --paper-alt: #17211c;
+  --ink: #eaefe9;
+  --ink-muted: #93a69a;
+  --line: #263129;
+  --brand: #33c08c;
+  --brand-strong: #23a375;
+  --brand-soft: #16342a;
+  --income: #3ecb86;
+  --expense: #e2725a;
+  --gold: #d9aa55;
+
+  color-scheme: dark;
+}
+
+* {
+  border-color: var(--line);
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Public Sans', ui-sans-serif, system-ui, sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Financial figures always line up in a tabular monospace */
+.money,
+.tabular {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.font-display {
+  font-family: 'Fraunces', ui-serif, Georgia, serif;
+}
+
+::selection {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+/* Slim, quiet scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+  border: 2px solid var(--paper);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Signature: the receipt stub.                                            */
+/* A torn perforated edge + faux barcode, echoing the app's "chek" upload. */
+/* Used sparingly — the balance card and the auth screens only.            */
+/* ---------------------------------------------------------------------- */
+
+.receipt {
+  position: relative;
+  background: var(--paper-alt);
+  border-radius: 20px;
+}
+
+.receipt::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 14px;
+  background-image: radial-gradient(circle at 7px 0, var(--paper) 6px, transparent 6.5px);
+  background-size: 14px 14px;
+  background-position: left bottom;
+  background-repeat: repeat-x;
+}
+
+.barcode-strip {
+  height: 22px;
+  border-radius: 3px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    currentColor 0px,
+    currentColor 1.5px,
+    transparent 1.5px,
+    transparent 3px,
+    currentColor 3px,
+    currentColor 3.5px,
+    transparent 3.5px,
+    transparent 6px,
+    currentColor 6px,
+    currentColor 8.5px,
+    transparent 8.5px,
+    transparent 10px
+  );
+  opacity: 0.22;
+}
+
+/* Segmented / pill toggle buttons (direction, balance type, payment type) */
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.segmented button {
+  border-radius: 9px;
+  transition: all 0.15s ease;
+}
+
+/* Category tile */
+.tile {
+  border: 1px solid var(--line);
+  background: var(--paper-alt);
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+}
+.tile:hover {
+  transform: translateY(-1px);
+}
+.tile[data-active='true'] {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

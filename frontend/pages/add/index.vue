@@ -106,7 +106,7 @@
         <UAlert v-if="error" color="red" variant="soft" :title="error" icon="i-lucide-alert-circle" />
         <UAlert v-if="success" color="green" variant="soft" title="Muvaffaqiyatli qo'shildi!" icon="i-lucide-check-circle" />
 
-        <UButton block size="lg" color="ledger" :loading="loading" @click="submit">Saqlash</UButton>
+        <UButton block size="lg" color="ledger" :loading="loading" :disabled="loading" @click="submit">Saqlash</UButton>
       </div>
     </UCard>
   </AppShell>

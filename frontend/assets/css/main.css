@@ -158,6 +158,24 @@ body {
   color: var(--brand-strong);
 }
 
+/* Explicit, Tailwind-independent responsive nav switch.
+   Guarantees the desktop pill-nav and the mobile bottom tab-bar
+   never show at the same time, regardless of Tailwind JIT/purge quirks. */
+.desktop-nav {
+  display: none !important;
+}
+.mobile-tabbar {
+  display: block !important;
+}
+@media (min-width: 640px) {
+  .desktop-nav {
+    display: flex !important;
+  }
+  .mobile-tabbar {
+    display: none !important;
+  }
+}
+
 /* iOS Safari auto-zooms on focus if an input's font-size is under 16px.
    Force 16px on all form fields on small screens to prevent that. */
 @media (max-width: 640px) {

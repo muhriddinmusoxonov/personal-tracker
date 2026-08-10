@@ -18,7 +18,7 @@
         </div>
 
         <!-- Desktop nav -->
-        <nav class="hidden sm:flex items-center gap-1 segmented">
+        <nav class="desktop-nav hidden sm:flex items-center gap-1 segmented">
           <NuxtLink
             v-for="item in navItems"
             :key="item.to"
@@ -60,7 +60,7 @@
 
     <!-- Mobile bottom tab bar -->
     <nav
-      class="sm:hidden fixed bottom-0 inset-x-0 z-40 border-t px-2 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]"
+      class="mobile-tabbar sm:hidden fixed bottom-0 inset-x-0 z-40 border-t px-2 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]"
       :style="{ background: 'var(--paper-alt)', borderColor: 'var(--line)' }"
     >
       <div class="flex items-center justify-around">

@@ -92,6 +92,7 @@
         <UFormGroup label="Chek yoki skrinshot">
           <input ref="fileInput" type="file" accept="image/*" capture="environment" class="hidden" @change="onFileChange" />
           <button
+          :disabled="true" style="cursor: not-allowed; opacity: 0.6;"
             type="button"
             class="w-full rounded-xl border-2 border-dashed px-4 py-5 flex flex-col items-center gap-1.5 text-sm transition"
             :style="{ borderColor: selectedFile ? 'var(--brand)' : 'var(--line)', color: selectedFile ? 'var(--brand-strong)' : 'var(--ink-muted)' }"
@@ -106,7 +107,7 @@
         <UAlert v-if="error" color="red" variant="soft" :title="error" icon="i-lucide-alert-circle" />
         <UAlert v-if="success" color="green" variant="soft" title="Muvaffaqiyatli qo'shildi!" icon="i-lucide-check-circle" />
 
-        <UButton block size="lg" color="ledger" :loading="loading" :disabled="true" style="cursor: not-allowed; opacity: 0.6;" @click="submit">Saqlash</UButton>
+        <UButton block size="lg" color="ledger" :loading="loading" @click="submit">Saqlash</UButton>
       </div>
     </UCard>
   </AppShell>

@@ -158,6 +158,16 @@ body {
   color: var(--brand-strong);
 }
 
+/* iOS Safari auto-zooms on focus if an input's font-size is under 16px.
+   Force 16px on all form fields on small screens to prevent that. */
+@media (max-width: 640px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;

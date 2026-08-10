@@ -15,7 +15,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: "Xarajatlarim — Hisob-kitob",
-      viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
+      viewport: 'width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1',
       meta: [
         { name: 'theme-color', content: '#0E7A5F' },
       ],

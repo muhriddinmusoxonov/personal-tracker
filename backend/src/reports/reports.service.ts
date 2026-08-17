@@ -65,7 +65,12 @@ export class ReportsService {
   // Excel fayl generatsiya qilish (buffer qaytaradi)
   async exportExcel(userId: string, userFullName: string, filters: ReportFilters): Promise<ExcelJS.Buffer> {
     const query = this.buildQuery(userId, filters);
-    const transactions = await this.transactionModel.find(query).populate('category').sort({ occurredAt: -1 });
+    const transactions = await this.transactionModel.find(query).populate('category').sort({ occurredAt: 1 });
+
+    // Debug: filtr bo'yicha nechta tranzaksiya topilganini konsolga chiqaramiz.
+    // Agar bu son kutilganidan kam bo'lsa (masalan doim 1), muammo query/DB tomonda,
+    // agar to'g'ri son chiqsa-yu Excelda 1 ta qator ko'rinsa, muammo Excel generatsiyasida emas.
+    console.log(`[reports.exportExcel] owner=${userId} from=${filters.from?.toISOString()} to=${filters.to?.toISOString()} topildi=${transactions.length}`);
 
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Hisobot');
@@ -86,7 +91,7 @@ export class ReportsService {
     for (const t of transactions) {
       sheet.addRow({
         user: userFullName,
-        datetime: t.occurredAt.toISOString().replace('T', ' ').substring(0, 19),
+        datetime: new Date(t.occurredAt).toLocaleString('sv-SE', { timeZone: 'Asia/Tashkent' }),
         direction: t.direction === 'income' ? 'Kirim' : 'Chiqim',
         category: (t.category as any)?.name || '-',
         amount: t.amount,

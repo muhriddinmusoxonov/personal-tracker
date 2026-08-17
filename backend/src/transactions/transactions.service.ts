@@ -40,12 +40,18 @@ export class TransactionsService {
       throw new BadRequestException("Summa noto'g'ri");
     }
 
+    // Kirim tranzaksiyalarida category bo'lishi mumkin emas — qanday kelib qolishidan
+    // qat'i nazar (frontenddan eskirib qolgan qiymat, AI tahlili va h.k.) shu yerda tozalanadi.
+    const category = params.direction === 'expense' && params.category
+      ? new Types.ObjectId(params.category)
+      : undefined;
+
     const transaction = await this.transactionModel.create({
       owner: userId,
       direction: params.direction,
       balanceType: params.balanceType,
       paymentType: params.paymentType,
-      category: params.category ? new Types.ObjectId(params.category) : undefined,
+      category,
       amount: params.amount,
       rawExpression: params.rawExpression,
       comment: params.comment,

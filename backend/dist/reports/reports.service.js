@@ -68,7 +68,6 @@ let ReportsService = class ReportsService {
     async exportExcel(userId, userFullName, filters) {
         const query = this.buildQuery(userId, filters);
         const transactions = await this.transactionModel.find(query).populate('category').sort({ occurredAt: 1 });
-        console.log(`[reports.exportExcel] owner=${userId} from=${filters.from?.toISOString()} to=${filters.to?.toISOString()} topildi=${transactions.length}`);
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Hisobot');
         sheet.columns = [
@@ -88,7 +87,7 @@ let ReportsService = class ReportsService {
                 user: userFullName,
                 datetime: new Date(t.occurredAt).toLocaleString('sv-SE', { timeZone: 'Asia/Tashkent' }),
                 direction: t.direction === 'income' ? 'Kirim' : 'Chiqim',
-                category: t.category?.name || '-',
+                category: t.direction === 'expense' ? (t.category?.name || '-') : '',
                 amount: t.amount,
                 paymentType: t.paymentType === 'cash' ? 'Naqd' : 'Karta',
                 balanceType: t.balanceType === 'personal' ? 'Personal' : 'Company',

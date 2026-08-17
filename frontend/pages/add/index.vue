@@ -173,7 +173,12 @@ function onFileChange(e: Event) {
 async function loadCategories() {
   categories.value = await request('/categories', { query: { type: form.direction } })
 }
-watch(() => form.direction, loadCategories)
+watch(() => form.direction, () => {
+  // Kirim/Chiqim almashtirilganda avval tanlangan category eskirib qoladi,
+  // shuning uchun har safar yo'nalish o'zgarganda tozalaymiz.
+  form.category = ''
+  loadCategories()
+})
 
 async function submit() {
   error.value = ''
@@ -193,7 +198,8 @@ async function submit() {
     body.append('direction', form.direction)
     body.append('balanceType', form.balanceType)
     body.append('paymentType', form.paymentType)
-    if (form.category) body.append('category', form.category)
+    // Kirim uchun category hech qachon yuborilmasin (ehtiyot chorasi)
+    if (form.direction === 'expense' && form.category) body.append('category', form.category)
     if (form.amountExpression) body.append('amountExpression', form.amountExpression)
     if (form.comment) body.append('comment', form.comment)
     body.append('occurredAt', new Date(form.occurredAt).toISOString())

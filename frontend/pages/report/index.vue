@@ -2,13 +2,13 @@
   <AppShell active="report">
     <div class="space-y-6 animate-fade-up">
       <!-- 1. Davr tanlash: kun / hafta / oy / yil -->
-      <div class="flex items-center justify-between flex-wrap gap-3">
-        <div class="segmented">
+      <div class="flex items-center justify-between gap-2 flex-nowrap">
+        <div class="segmented overflow-x-auto" style="scrollbar-width: none">
           <button
             v-for="p in periods"
             :key="p.value"
             type="button"
-            class="px-3.5 py-1.5 text-sm font-semibold"
+            class="px-3.5 py-1.5 text-sm font-semibold whitespace-nowrap"
             :style="period === p.value
               ? { background: 'var(--paper-alt)', color: 'var(--brand-strong)', boxShadow: '0 1px 2px rgba(22,33,28,0.06)' }
               : { color: 'var(--ink-muted)' }"
@@ -18,11 +18,11 @@
           </button>
         </div>
 
-        <div class="flex items-center gap-3">
-          <USelectMenu v-model="balanceType" :options="balanceOptions" value-attribute="value" option-attribute="label" class="w-40" />
-          <UButton icon="i-lucide-download" color="gray" variant="soft" @click="exportModalOpen = true">
-            {{ t('download') }}
-          </UButton>
+        <div class="flex items-center gap-2 shrink-0">
+          <UDropdown :items="balanceMenuItems" :popper="{ placement: 'bottom-end' }">
+            <UButton :icon="balanceIcon" color="gray" variant="soft" square :aria-label="t('balance')" />
+          </UDropdown>
+          <UButton :icon="'i-lucide-download'" color="gray" variant="soft" square @click="exportModalOpen = true" :aria-label="t('download')" />
         </div>
       </div>
 
@@ -205,6 +205,19 @@ const summary = ref<any>(null)
 const balance = ref<any>(null)
 const categories = ref<any[]>([])
 const budgets = ref<any[]>([])
+
+// Balans filtri endi kichik ikonka-tugma orqali ochiladigan dropdown menyu —
+// tanlangan turga qarab ikonka o'zgaradi, shu bilan joriy filtr ham ko'rinib turadi.
+const balanceIcons: Record<string, string> = { '': 'i-lucide-layers', personal: 'i-lucide-user', company: 'i-lucide-building-2' }
+const balanceIcon = computed(() => balanceIcons[balanceType.value] || 'i-lucide-layers')
+const balanceMenuItems = computed(() => [
+  balanceOptions.value.map((o) => ({
+    label: o.label,
+    icon: balanceIcons[o.value],
+    click: () => { balanceType.value = o.value },
+    class: balanceType.value === o.value ? 'font-semibold' : '',
+  })),
+])
 
 const exportModalOpen = ref(false)
 

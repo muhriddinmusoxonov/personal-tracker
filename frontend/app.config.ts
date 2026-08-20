@@ -16,6 +16,11 @@ export default defineAppConfig({
       rounded: 'rounded-xl',
       font: 'font-semibold',
       default: { loadingIcon: 'i-lucide-loader-2' },
+      color: {
+        gray: {
+          soft: 'text-[var(--ink-muted)] bg-[var(--paper)] hover:bg-[var(--paper-alt)] disabled:bg-[var(--paper)] disabled:opacity-60',
+        },
+      },
     },
     input: {
       rounded: 'rounded-xl',

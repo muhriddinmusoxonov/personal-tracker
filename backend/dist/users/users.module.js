@@ -11,13 +11,26 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const user_schema_1 = require("./schemas/user.schema");
 const users_service_1 = require("./users.service");
+const users_controller_1 = require("./users.controller");
+const transaction_schema_1 = require("../transactions/schemas/transaction.schema");
+const category_schema_1 = require("../categories/schemas/category.schema");
+const budget_schema_1 = require("../budgets/schemas/budget.schema");
+const balance_schema_1 = require("../balances/schemas/balance.schema");
+const categories_module_1 = require("../categories/categories.module");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
 exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
-        imports: [mongoose_1.MongooseModule.forFeature([{ name: user_schema_1.User.name, schema: user_schema_1.UserSchema }])],
+        imports: [categories_module_1.CategoriesModule, mongoose_1.MongooseModule.forFeature([
+                { name: user_schema_1.User.name, schema: user_schema_1.UserSchema },
+                { name: transaction_schema_1.Transaction.name, schema: transaction_schema_1.TransactionSchema },
+                { name: category_schema_1.Category.name, schema: category_schema_1.CategorySchema },
+                { name: budget_schema_1.Budget.name, schema: budget_schema_1.BudgetSchema },
+                { name: balance_schema_1.Balance.name, schema: balance_schema_1.BalanceSchema },
+            ])],
         providers: [users_service_1.UsersService],
+        controllers: [users_controller_1.UsersController],
         exports: [users_service_1.UsersService],
     })
 ], UsersModule);

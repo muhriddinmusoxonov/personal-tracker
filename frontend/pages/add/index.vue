@@ -2,49 +2,49 @@
   <AppShell active="add">
     <UCard class="max-w-xl mx-auto animate-fade-up">
       <template #header>
-        <h2 class="font-display font-semibold text-lg">Kirim / Chiqim qo'shish</h2>
+        <h2 class="font-display font-semibold text-lg">{{ t('income') }} / {{ t('expense') }} {{ t('add') }}</h2>
       </template>
 
       <div class="space-y-5">
         <!-- Sana -->
-        <UFormGroup label="Sana">
+        <UFormGroup :label="t('date')">
           <UInput v-model="form.occurredAt" type="datetime-local" icon="i-lucide-calendar" />
         </UFormGroup>
 
         <!-- Balance -->
-        <UFormGroup label="Balance">
+        <UFormGroup :label="t('balance')">
           <div class="segmented w-full">
             <button
               type="button" class="flex-1 px-3.5 py-2 text-sm font-semibold"
               :style="form.balanceType === 'personal' ? activeStyle : mutedStyle"
               @click="form.balanceType = 'personal'"
-            >Personal</button>
+            >{{ t('personal') }}</button>
             <button
               type="button" class="flex-1 px-3.5 py-2 text-sm font-semibold"
               :style="form.balanceType === 'company' ? activeStyle : mutedStyle"
               @click="form.balanceType = 'company'"
-            >Company</button>
+            >{{ t('company') }}</button>
           </div>
         </UFormGroup>
 
         <!-- Kirim / Chiqim -->
-        <UFormGroup label="Turi">
+        <UFormGroup :label="t('type')">
           <div class="segmented w-full">
             <button
               type="button" class="flex-1 px-3.5 py-2 text-sm font-semibold"
               :style="form.direction === 'expense' ? expenseActiveStyle : mutedStyle"
               @click="form.direction = 'expense'"
-            >Chiqim</button>
+            >{{ t('expense') }}</button>
             <button
               type="button" class="flex-1 px-3.5 py-2 text-sm font-semibold"
               :style="form.direction === 'income' ? incomeActiveStyle : mutedStyle"
               @click="form.direction = 'income'"
-            >Kirim</button>
+            >{{ t('income') }}</button>
           </div>
         </UFormGroup>
 
         <!-- Category (faqat chiqim uchun) -->
-        <UFormGroup v-if="form.direction === 'expense'" label="Category">
+        <UFormGroup v-if="form.direction === 'expense'" :label="t('category')">
           <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
             <button
               v-for="c in categories"
@@ -55,41 +55,41 @@
               @click="form.category = c._id"
             >
               <UIcon :name="`i-lucide-${c.icon}`" class="w-5 h-5" />
-              <span class="text-xs font-medium">{{ c.name }}</span>
+              <span class="text-xs font-medium">{{ categoryLabel(c) }}</span>
             </button>
           </div>
         </UFormGroup>
 
         <!-- To'lov turi -->
-        <UFormGroup label="To'lov turi">
+        <UFormGroup :label="t('paymentType')">
           <div class="segmented w-full">
             <button
               type="button" class="flex-1 px-3.5 py-2 text-sm font-semibold"
               :style="form.paymentType === 'cash' ? activeStyle : mutedStyle"
               @click="form.paymentType = 'cash'"
-            >Naqd</button>
+            >{{ t('cash') }}</button>
             <button
               type="button" class="flex-1 px-3.5 py-2 text-sm font-semibold"
               :style="form.paymentType === 'card' ? activeStyle : mutedStyle"
               @click="form.paymentType = 'card'"
-            >Karta</button>
+            >{{ t('card') }}</button>
           </div>
         </UFormGroup>
 
         <!-- Miqdor (kalkulyator: 25000*3) -->
-        <UFormGroup label="Miqdor">
+        <UFormGroup :label="t('amount')">
           <UInput v-model="form.amountExpression" placeholder="masalan: 25000*3" icon="i-lucide-calculator" class="money" />
           <template #help>
-            <span class="money" style="color: var(--brand-strong)">Natija: {{ formatMoney(calculatedAmount) }}</span>
+            <span class="money" style="color: var(--brand-strong)">{{ t('result') }}: {{ formatMoney(calculatedAmount) }}</span>
           </template>
         </UFormGroup>
 
-        <UFormGroup label="Izoh (ixtiyoriy)">
-          <UTextarea v-model="form.comment" placeholder="Izoh yozing..." />
+        <UFormGroup :label="`${t('comment')} (${t('optional')})`">
+          <UTextarea v-model="form.comment" :placeholder="t('commentPlaceholder')" />
         </UFormGroup>
 
         <!-- Chek / skrinshot yuklash -->
-        <UFormGroup label="Chek yoki skrinshot">
+        <UFormGroup :label="t('receipt')">
           <input ref="fileInput" type="file" accept="image/*" capture="environment" class="hidden" @change="onFileChange" />
           <button
           :disabled="true" style="cursor: not-allowed; opacity: 0.6;"
@@ -99,15 +99,15 @@
             @click="fileInput?.click()"
           >
             <UIcon :name="selectedFile ? 'i-lucide-image' : 'i-lucide-camera'" class="w-6 h-6" />
-            <span class="font-medium">{{ selectedFile ? selectedFile.name : 'Rasm tanlash yoki skrinshot yuklash' }}</span>
+            <span class="font-medium">{{ selectedFile ? selectedFile.name : t('chooseImage') }}</span>
           </button>
-          <UCheckbox v-if="selectedFile" v-model="useAi" label="AI orqali avtomatik aniqlash (summa va category)" class="mt-2.5" />
+          <UCheckbox v-if="selectedFile" v-model="useAi" :label="t('ai')" class="mt-2.5" />
         </UFormGroup>
 
         <UAlert v-if="error" color="red" variant="soft" :title="error" icon="i-lucide-alert-circle" />
-        <UAlert v-if="success" color="green" variant="soft" title="Muvaffaqiyatli qo'shildi!" icon="i-lucide-check-circle" />
+        <UAlert v-if="success" color="green" variant="soft" :title="t('successAdded')" icon="i-lucide-check-circle" />
 
-        <UButton block size="lg" color="ledger" :loading="loading" @click="submit">Saqlash</UButton>
+        <UButton block size="lg" color="ledger" :loading="loading" @click="submit">{{ t('save') }}</UButton>
       </div>
     </UCard>
   </AppShell>
@@ -117,6 +117,7 @@
 definePageMeta({ middleware: 'auth' })
 
 const { request } = useApi()
+const { t, formatMoney: localizedMoney, categoryLabel } = useI18n()
 
 const categories = ref<any[]>([])
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -162,7 +163,7 @@ const calculatedAmount = computed(() => {
 })
 
 function formatMoney(n: number) {
-  return new Intl.NumberFormat('uz-UZ').format(n || 0) + " so'm"
+  return localizedMoney(n)
 }
 
 function onFileChange(e: Event) {
@@ -184,11 +185,11 @@ async function submit() {
   error.value = ''
   success.value = false
   if (form.direction === 'expense' && !form.category) {
-    error.value = 'Category tanlanmadi'
+    error.value = t('categoryRequired')
     return
   }
   if (!form.amountExpression && !selectedFile.value) {
-    error.value = 'Miqdor kiriting yoki chek rasmini yuklang'
+    error.value = t('amountRequired')
     return
   }
 
@@ -214,7 +215,7 @@ async function submit() {
     form.comment = ''
     selectedFile.value = null
   } catch (e: any) {
-    error.value = e?.data?.message || 'Xatolik yuz berdi'
+    error.value = e?.data?.message || t('error')
   } finally {
     loading.value = false
   }

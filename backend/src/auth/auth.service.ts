@@ -12,7 +12,7 @@ export class AuthService {
   async register(dto: RegisterDto) {
     const existing = await this.usersService.findByEmail(dto.email);
     if (existing) {
-      throw new BadRequestException('Bu email allaqachon ro\'yxatdan o\'tgan');
+      throw new BadRequestException('EMAIL_EXISTS');
     }
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const user = await this.usersService.create({
@@ -25,9 +25,9 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.usersService.findByEmail(dto.email);
-    if (!user) throw new UnauthorizedException('Email yoki parol noto\'g\'ri');
+    if (!user) throw new UnauthorizedException('INVALID_CREDENTIALS');
     const match = await bcrypt.compare(dto.password, user.passwordHash);
-    if (!match) throw new UnauthorizedException('Email yoki parol noto\'g\'ri');
+    if (!match) throw new UnauthorizedException('INVALID_CREDENTIALS');
     return this.buildToken(user.id, user.email, user.fullName);
   }
 

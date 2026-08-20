@@ -69,12 +69,12 @@
           <h2 class="font-display font-semibold text-lg">{{ t('categoryExpenses') }}</h2>
         </template>
         <div v-if="summary?.byCategory?.length" class="max-w-md mx-auto relative">
-          <Doughnut :data="chartData" :options="chartOptions" />
+          <Doughnut ref="chartRef" :data="chartData" :options="chartOptions" />
           <div
             v-for="(c, i) in summary.byCategory"
             :key="c.name"
             class="absolute flex items-center justify-center rounded-full pointer-events-none"
-            :style="categoryIconStyle(i)"
+            :style="iconPositions[i] || { opacity: 0 }"
           >
             <UIcon :name="`i-lucide-${c.icon}`" class="w-4 h-4 sm:w-5 sm:h-5" style="color: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.45))" />
           </div>
@@ -344,6 +344,9 @@ const chartData = computed(() => ({
     },
   ],
 }))
+const chartRef = ref<any>(null)
+const iconPositions = ref<Record<number, any>>({})
+
 const chartOptions = {
   responsive: true,
   // Har doim yuqoridan (soat 12) boshlab, soat mili yo'nalishida chizamiz —
@@ -356,39 +359,52 @@ const chartOptions = {
       labels: { font: { family: "'Public Sans'" }, usePointStyle: true, boxWidth: 8 },
     },
   },
+  // Legenda pastda chizilgani uchun halqa canvasning butun balandligini egallamaydi
+  // (yuqori qismga siqiladi), shu sababli ikonkalar joylashuvini har bir chizishdan
+  // keyin Chart.js'ning haqiqiy geometriyasidan qayta hisoblaymiz.
+  animation: { onComplete: () => syncIconPositions() },
+  onResize: () => nextTick(() => syncIconPositions()),
 }
 
-// Har bir category segmentining o'rtasiga (halqaning taxminan markaziga) ikonkani joylashtirish uchun
-// burchakni hisoblaydi va foizli (top/left) koordinataga aylantiradi. Diagramma har doim kvadrat
-// (aspectRatio 1) bo'lgani uchun foizli joylashtiruv turli ekran o'lchamlarida ham to'g'ri ishlaydi.
-function categoryIconStyle(index: number) {
+// Ikonkalarni foizli (top/left) koordinata bo'yicha "taxmin qilish" o'rniga, Chart.js chizib
+// bo'lgan halqaning haqiqiy piksel geometriyasidan (har bir arc'ning markazi, radiusi va burchagi)
+// o'qib olamiz. Shunda legenda, canvas o'lchami yoki ekran kengligi qanday bo'lishidan qat'i nazar
+// ikonka har doim o'z segmentining aynan o'rtasida turadi.
+function syncIconPositions() {
+  const chart = chartRef.value?.chart
   const items = summary.value?.byCategory || []
-  const total = items.reduce((s: number, c: any) => s + c.total, 0) || 1
+  if (!chart || !items.length) return
 
-  let before = 0
-  for (let i = 0; i < index; i++) before += items[i].total
-  const value = items[index].total
+  const meta = chart.getDatasetMeta(0)
+  const canvas = chart.canvas as HTMLCanvasElement
+  const w = canvas.clientWidth || canvas.width || 1
+  const h = canvas.clientHeight || canvas.height || 1
 
-  const startDeg = -90 + (before / total) * 360
-  const sweepDeg = (value / total) * 360
-  const midDeg = startDeg + sweepDeg / 2
-  const midRad = (midDeg * Math.PI) / 180
+  const next: Record<number, any> = {}
+  items.forEach((_c: any, i: number) => {
+    const arc = meta?.data?.[i] as any
+    if (!arc) { next[i] = { opacity: 0 }; return }
 
-  // Halqa (ring) taxminan 50%–100% radius oralig'ida, shuning uchun ikonka ~75% radiusga joylashadi
-  const R = 0.75
-  const leftPct = 50 + Math.cos(midRad) * R * 50
-  const topPct = 50 + Math.sin(midRad) * R * 50
+    const sweep = arc.endAngle - arc.startAngle
+    const midAngle = arc.startAngle + sweep / 2
+    const radius = (arc.innerRadius + arc.outerRadius) / 2
+    const px = arc.x + Math.cos(midAngle) * radius
+    const py = arc.y + Math.sin(midAngle) * radius
 
-  // Juda kichik (taxminan 4% dan kam) bo'lakларда ikonka sig'may qolishi mumkin — shunday hollarda yashiramiz
-  const visible = sweepDeg >= 14
+    // Juda kichik (taxminan 4% dan kam) bo'laklarda ikonka sig'may qolishi mumkin — yashiramiz
+    const visible = sweep >= (14 * Math.PI) / 180
 
-  return {
-    left: `${leftPct}%`,
-    top: `${topPct}%`,
-    transform: 'translate(-50%, -50%)',
-    opacity: visible ? 1 : 0,
-  }
+    next[i] = {
+      left: `${(px / w) * 100}%`,
+      top: `${(py / h) * 100}%`,
+      transform: 'translate(-50%, -50%)',
+      opacity: visible ? 1 : 0,
+    }
+  })
+  iconPositions.value = next
 }
+
+watch(chartData, () => nextTick(syncIconPositions))
 
 function formatMoney(n: number) {
   return localizedMoney(n)
@@ -427,5 +443,7 @@ watch([balanceType, refDate], loadSummary)
 
 onMounted(async () => {
   await Promise.all([loadSummary(), loadBalance(), loadCategories(), loadBudgets()])
+  await nextTick()
+  syncIconPositions()
 })
 </script>

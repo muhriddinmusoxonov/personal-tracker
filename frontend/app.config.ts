@@ -27,5 +27,14 @@ export default defineAppConfig({
     notifications: {
       position: 'top-0 bottom-auto',
     },
+    modal: {
+      // items-start (instead of items-center) keeps the dialog pinned near the top of the
+      // visible screen at all times. A vertically centered modal is positioned using the
+      // full layout-viewport height; on iOS Safari that height does not shrink when the
+      // keyboard appears, so the computed "center" ends up hidden behind the keyboard.
+      // Anchoring to the top avoids that calculation entirely.
+      container: 'flex min-h-full items-start sm:items-center justify-center text-center',
+      margin: 'mt-[max(1.5rem,env(safe-area-inset-top))] mb-8 sm:my-8',
+    },
   },
 })

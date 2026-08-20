@@ -74,13 +74,22 @@ export function useI18n() {
 
   function categoryLabel(category: any) {
     if (!category) return ''
-    const keyByIcon: Record<string, string> = {
-      dumbbell: 'categorySport', utensils: 'categoryFood', car: 'categoryTransport', shirt: 'categoryClothes', home: 'categoryUtilities',
-      'heart-pulse': 'categoryHealth', popcorn: 'categoryEntertainment', wallet: 'categorySalary', 'more-horizontal': 'categoryOther',
+    // MUHIM: ikonka bo'yicha tarjima faqat standart (isDefault) kategoriyalar uchun ishlaydi.
+    // Aks holda, foydalanuvchi o'zi yaratgan (custom) kategoriya standart kategoriyalardan
+    // biri bilan bir xil ikonkani tanlasa (masalan "utensils"), ikkalasi ham interfeysda
+    // aynan bir xil nom bilan ko'rinib qolar edi — garchi ular backendda butunlay boshqa-boshqa
+    // _id'ga ega bo'lsa-da. Bu esa, masalan, byudjet bitta kategoriyaga (bir _id) bog'langan
+    // bo'lsa-yu, tranzaksiya boshqa (lekin bir xil nomda ko'rinadigan) kategoriyaga yozilgan
+    // bo'lsa, byudjetda "sarflangan" summa hech qachon yangilanmasligiga olib kelardi.
+    if (category.isDefault) {
+      const keyByIcon: Record<string, string> = {
+        dumbbell: 'categorySport', utensils: 'categoryFood', car: 'categoryTransport', shirt: 'categoryClothes', home: 'categoryUtilities',
+        'heart-pulse': 'categoryHealth', popcorn: 'categoryEntertainment', wallet: 'categorySalary', 'more-horizontal': 'categoryOther',
+      }
+      const key = keyByIcon[category.icon]
+      if (key) return t(key)
     }
-    const key = keyByIcon[category.icon]
-    if (!key) return category.name
-    return t(key)
+    return category.name
   }
 
   return { locale: currentLocale, t, setLocale, localeTag, formatMoney, categoryLabel }
